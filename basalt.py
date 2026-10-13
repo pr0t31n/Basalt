@@ -18,7 +18,11 @@ from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
 
-VERSION = Path(__file__).resolve().parent.joinpath("VERSION").read_text().strip()
+if getattr(sys, "frozen", False):
+    _BASE = Path(sys._MEIPASS)
+else:
+    _BASE = Path(__file__).resolve().parent
+VERSION = _BASE.joinpath("VERSION").read_text().strip()
 
 MAGIC = b"BSLT"
 FMT_VER = 1
