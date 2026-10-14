@@ -18,14 +18,36 @@ def _has(binary):
     return shutil.which(binary) is not None
 
 
+def _pip_installed(pkg_spec):
+    import importlib.util
+    name = pkg_spec.split(">=")[0].split("==")[0].split("[")[0].split("<")[0].strip()
+    _IMPORT_MAP = {
+        "pyyaml": "yaml", "Pillow": "PIL", "beautifulsoup4": "bs4",
+        "flask-socketio": "flask_socketio", "python-nmap": "nmap",
+        "python-docx": "docx", "pyOpenSSL": "OpenSSL",
+        "charset-normalizer": "charset_normalizer",
+        "webdriver-manager": "webdriver_manager",
+    }
+    mod = _IMPORT_MAP.get(name, name.replace("-", "_"))
+    return importlib.util.find_spec(mod) is not None
+
+
 def install_pip_deps():
     """Install Python packages."""
     req = Path(__file__).resolve().parent / "requirements.txt"
-    if req.exists():
-        _run([sys.executable, "-m", "pip", "install",
-              "--break-system-packages", "-r", str(req)])
-    else:
+    if not req.exists():
         print("  requirements.txt not found, skipping pip install")
+        return
+    with open(req) as fh:
+        lines = [l.strip() for l in fh if l.strip() and not l.startswith("#")]
+    missing = [l for l in lines if not _pip_installed(l)]
+    if not missing:
+        print("  all Python packages already installed")
+        return
+    for pkg in missing:
+        print(f"  Installing {pkg} ...")
+        _run([sys.executable, "-m", "pip", "install",
+              "--break-system-packages", pkg])
 
 
 def main():

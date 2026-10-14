@@ -338,6 +338,19 @@ def cmd_backup(args):
         sidecar_path.write_text(
             json.dumps(sidecar, indent=2), encoding="utf-8")
 
+        try:
+            import sys as _sys
+            if "/opt/pr0t31n/shared" not in _sys.path:
+                _sys.path.insert(0, "/opt/pr0t31n/shared")
+            import pr0t31n_dep_snapshot as _ds
+            _ds.write_snapshot(
+                dest, "Basalt", VERSION,
+                binaries=[],
+                pip_packages=["cryptography"],
+            )
+        except Exception:
+            pass
+
         if args.retain:
             pruned = _do_prune(dest, args.retain)
             if pruned:
