@@ -240,17 +240,29 @@ def cmd_backup(args):
         print("Nothing to back up — source directories are empty.")
         return
 
-    # Phase 2: tar + compress
+    # Phase 2: tar + compress (driven by manifest — only adds files Phase 1 scanned)
     print("Phase 2/4: Creating compressed archive...")
     t1 = time.time()
+    skip_count = 0
     tmp_tar = tempfile.NamedTemporaryFile(suffix=".tar.gz", delete=False)
     try:
         with tarfile.open(tmp_tar.name, "w:gz", compresslevel=6) as tar:
-            for i, s in enumerate(sources):
+            for entry in manifest_entries:
+                si = entry["source_index"]
+                s = sources[si]
                 if s.is_file():
-                    tar.add(str(s), arcname=f"{i}/{s.name}")
+                    fp = s
+                    arcname = f"{si}/{s.name}"
                 else:
-                    tar.add(str(s), arcname=str(i))
+                    fp = s / entry["relative_path"]
+                    arcname = f"{si}/{entry['relative_path']}"
+                try:
+                    tar.add(str(fp), arcname=arcname, recursive=False)
+                except (PermissionError, OSError) as e:
+                    print(f"  WARN: tar skip {fp}: {e}", file=sys.stderr)
+                    skip_count += 1
+            if skip_count:
+                print(f"  {skip_count} files skipped (permission denied)")
             mbytes = json.dumps({
                 "backup_id": backup_id,
                 "basalt_version": VERSION,
