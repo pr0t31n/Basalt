@@ -47,6 +47,9 @@ Security testing is a professional discipline with significant ethical and legal
 
 Encrypted file-level backup and restore tool with cryptographic validation and atomic rollback.
 
+
+> **[View full documentation on the Codex Wiki](https://wiki.pr0t31n.com/tools/basalt)** — detailed features, CLI reference, findings catalogue, and integration guides.
+
 ## Features
 
 - **AES-256-CTR encryption** with HMAC-SHA256 authentication (Encrypt-then-MAC)
