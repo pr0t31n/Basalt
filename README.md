@@ -72,6 +72,27 @@ cd /opt/pr0t31n/Basalt
 python3 install.py
 ```
 
+## CLI Reference
+
+| Subcommand | Flag | Short | Description |
+|------------|------|-------|-------------|
+| (global) | `--version` | `-V` | Print version and exit |
+| `backup` | `--source` | `-s` | Directory to back up (repeatable, required) |
+| `backup` | `--dest` | `-d` | Destination directory (required) |
+| `backup` | `--retain` | `-r` | Keep only N newest backups (prune older) |
+| `backup` | `--passphrase-file` | | Read encryption passphrase from file |
+| `restore` | `--archive` | `-a` | Path to `.basalt` archive (required) |
+| `restore` | `--target` | `-t` | Restore to alternate directory |
+| `restore` | `--passphrase-file` | | Read passphrase from file |
+| `restore` | `--auto-confirm` | `-y` | Skip interactive restore confirmation |
+| `verify` | `--archive` | `-a` | Path to `.basalt` archive (required) |
+| `verify` | `--passphrase-file` | | Read passphrase from file |
+| `verify` | `--deep` | | Full content hash verification |
+| `verify` | `--check-current` | | Compare archive contents against current filesystem |
+| `list` | `--dest` | `-d` | Directory containing backups (required) |
+| `prune` | `--dest` | `-d` | Directory containing backups (required) |
+| `prune` | `--retain` | `-r` | Number of backups to keep (required) |
+
 ## Usage
 
 ### Backup
@@ -116,7 +137,7 @@ The restore process:
 3. Moves existing target directories to safety copies
 4. Extracts files to original (or target) locations
 5. Verifies every restored file against SHA-256 manifest
-6. On success: prompts to delete safety copies
+6. On success: prompts to delete safety copies (use `--auto-confirm` / `-y` to skip)
 7. On failure: automatically rolls back to pre-restore state
 
 ### Verify
